@@ -13,105 +13,107 @@ require 'init'
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 
 def setup_db
-  ActiveRecord::Schema.define(:version => 1) do
-    create_table :paranoid_times do |t|
-      t.string    :name
-      t.datetime  :deleted_at
-      t.integer   :paranoid_belongs_dependant_id
-      t.integer   :not_paranoid_id
+  silence_stream(STDOUT) do
+    ActiveRecord::Schema.define(:version => 1) do
+      create_table :paranoid_times do |t|
+        t.string    :name
+        t.datetime  :deleted_at
+        t.integer   :paranoid_belongs_dependant_id
+        t.integer   :not_paranoid_id
 
-      t.timestamps
-    end
+        t.timestamps
+      end
 
-    create_table :paranoid_booleans do |t|
-      t.string    :name
-      t.boolean   :is_deleted
-      t.integer   :paranoid_time_id
+      create_table :paranoid_booleans do |t|
+        t.string    :name
+        t.boolean   :is_deleted
+        t.integer   :paranoid_time_id
 
-      t.timestamps
-    end
+        t.timestamps
+      end
 
-    create_table :not_paranoids do |t|
-      t.string    :name
-      t.integer   :paranoid_time_id
-      
-      t.timestamps
-    end
+      create_table :not_paranoids do |t|
+        t.string    :name
+        t.integer   :paranoid_time_id
 
-    create_table :has_one_not_paranoids do |t|
-      t.string    :name
-      t.integer   :paranoid_time_id
+        t.timestamps
+      end
 
-      t.timestamps
-    end
+      create_table :has_one_not_paranoids do |t|
+        t.string    :name
+        t.integer   :paranoid_time_id
 
-    create_table :paranoid_has_many_dependants do |t|
-      t.string    :name
-      t.datetime  :deleted_at
-      t.integer   :paranoid_time_id
-      t.integer   :paranoid_belongs_dependant_id
+        t.timestamps
+      end
 
-      t.timestamps
-    end
+      create_table :paranoid_has_many_dependants do |t|
+        t.string    :name
+        t.datetime  :deleted_at
+        t.integer   :paranoid_time_id
+        t.integer   :paranoid_belongs_dependant_id
 
-    create_table :paranoid_belongs_dependants do |t|
-      t.string    :name
-      t.datetime  :deleted_at
+        t.timestamps
+      end
 
-      t.timestamps
-    end
+      create_table :paranoid_belongs_dependants do |t|
+        t.string    :name
+        t.datetime  :deleted_at
 
-    create_table :paranoid_has_one_dependants do |t|
-      t.string    :name
-      t.datetime  :deleted_at
-      t.integer   :paranoid_boolean_id
+        t.timestamps
+      end
 
-      t.timestamps
-    end
-    
-    create_table :paranoid_with_callbacks do |t|
-      t.string    :name
-      t.datetime  :deleted_at
-      
-      t.timestamps
-    end
+      create_table :paranoid_has_one_dependants do |t|
+        t.string    :name
+        t.datetime  :deleted_at
+        t.integer   :paranoid_boolean_id
 
-    create_table :paranoid_destroy_companies do |t|
-      t.string :name
-      t.datetime :deleted_at
-      
-      t.timestamps
-    end
-    
-    create_table :paranoid_delete_companies do |t|
-      t.string :name
-      t.datetime :deleted_at
-      
-      t.timestamps
-    end
-    
-    create_table :paranoid_products do |t|
-      t.integer :paranoid_destroy_company_id
-      t.integer :paranoid_delete_company_id
-      t.string :name
-      t.datetime :deleted_at
-      
-      t.timestamps
-    end
-    
-    create_table :super_paranoids do |t|
-      t.string :type
-      t.references :has_many_inherited_super_paranoidz
-      t.datetime :deleted_at
-      
-      t.timestamps
-    end
-    
-    create_table :has_many_inherited_super_paranoidzs do |t|
-      t.references :super_paranoidz
-      t.datetime :deleted_at
-      
-      t.timestamps
+        t.timestamps
+      end
+
+      create_table :paranoid_with_callbacks do |t|
+        t.string    :name
+        t.datetime  :deleted_at
+
+        t.timestamps
+      end
+
+      create_table :paranoid_destroy_companies do |t|
+        t.string :name
+        t.datetime :deleted_at
+
+        t.timestamps
+      end
+
+      create_table :paranoid_delete_companies do |t|
+        t.string :name
+        t.datetime :deleted_at
+
+        t.timestamps
+      end
+
+      create_table :paranoid_products do |t|
+        t.integer :paranoid_destroy_company_id
+        t.integer :paranoid_delete_company_id
+        t.string :name
+        t.datetime :deleted_at
+
+        t.timestamps
+      end
+
+      create_table :super_paranoids do |t|
+        t.string :type
+        t.references :has_many_inherited_super_paranoidz
+        t.datetime :deleted_at
+
+        t.timestamps
+      end
+
+      create_table :has_many_inherited_super_paranoidzs do |t|
+        t.references :super_paranoidz
+        t.datetime :deleted_at
+
+        t.timestamps
+      end
     end
   end
 end
@@ -171,27 +173,27 @@ end
 
 class ParanoidWithCallback < ActiveRecord::Base
   acts_as_paranoid
-  
+
   attr_accessor :called_before_destroy, :called_after_destroy, :called_after_commit_on_destroy
-  
+
   before_destroy :call_me_before_destroy
   after_destroy :call_me_after_destroy
-  
+
   after_commit :call_me_after_commit_on_destroy, :on => :destroy
-  
+
   def initialize(*attrs)
     @called_before_destroy = @called_after_destroy = @called_after_commit_on_destroy = false
     super(*attrs)
   end
-  
+
   def call_me_before_destroy
     @called_before_destroy = true
   end
-  
+
   def call_me_after_destroy
     @called_after_destroy = true
   end
-  
+
   def call_me_after_commit_on_destroy
     @called_after_commit_on_destroy = true
   end
