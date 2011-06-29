@@ -1,8 +1,15 @@
-source "http://rubygems.org"
+source :rubygems
 
-gem "rails3_acts_as_paranoid", :path => File.expand_path("..", __FILE__)
+gemspec
 
-# Development dependencies 
-gem "rake"
-gem "activesupport"
-gem "sqlite3-ruby"
+# Development dependencies
+group :development do
+  gem "rake"
+  gem "activesupport"
+  gem "sqlite3-ruby"
+  gem 'ruby-debug19'
+  gem 'guard'
+  gem 'guard-test'
+  gem 'guard-ego'
+  gem 'guard-bundler'
+end
